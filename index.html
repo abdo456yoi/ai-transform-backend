@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Transformation</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: #111827;
+      padding: 30px;
+      border-radius: 20px;
+      width: 350px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .upload-box {
+      border: 2px dashed #374151;
+      padding: 20px;
+      border-radius: 15px;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+
+    .upload-box:hover {
+      background: #1f2937;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: none;
+    }
+
+    button {
+      background: #22c55e;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #16a34a;
+    }
+
+    img {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .loader {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+<h1>🔥 AI Transformation</h1>
+
+<label class="upload-box">
+  Click to upload image
+  <input type="file" id="image" onchange="preview()">
+</label>
+
+<img id="preview" style="display:none"/>
+
+<select id="gender">
+  <option value="male">Male</option>
+  <option value="female">Female</option>
+</select>
+
+<select id="goal">
+  <option value="lose_weight">Lose Weight</option>
+  <option value="gain_muscle">Gain Muscle</option>
+</select>
+
+<button onclick="upload()">Generate</button>
+
+<div id="status" class="loader"></div>
+
+</div>
+
+<script>
+function preview() {
+  let file = document.getElementById("image").files[0];
+  let img = document.getElementById("preview");
+  img.src = URL.createObjectURL(file);
+  img.style.display = "block";
+}
+
+async function upload() {
+  let file = document.getElementById("image").files[0];
+  if (!file) return alert("Upload image first");
+
+  let formData = new FormData();
+  formData.append("image", file);
+  formData.append("gender", document.getElementById("gender").value);
+  formData.append("goal", document.getElementById("goal").value);
+
+  document.getElementById("status").innerText = "⏳ Generating...";
+
+  let res = await fetch("https://ai-transform-backend.onrender.com/generate", {
+    method: "POST",
+    body: formData
+  });
+
+  let data = await res.json();
+
+  document.getElementById("status").innerText = "✅ Done";
+
+  // 👉 SHOW RESULT IMAGE
+  if (data.image_url) {
+    let resultImg = document.createElement("img");
+    resultImg.src = data.image_url;
+    resultImg.style.marginTop = "15px";
+    resultImg.style.width = "100%";
+
+    document.querySelector(".card").appendChild(resultImg);
+  }
+}
+</script>
+
+</body>
+</html>
