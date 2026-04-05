@@ -176,7 +176,12 @@ async function upload() {
 
   if (data.image_url) {
     box.innerHTML = `
-      <img src="${data.image_url}" />
+      <img src="${data.image_url}" style="
+  width:100%;
+  aspect-ratio:9/16;
+  object-fit:cover;
+  border-radius:10px;
+" />
       <a class="download" href="${data.image_url}" target="_blank">⬇ Download</a>
     `;
   } else {
