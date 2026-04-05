@@ -132,14 +132,21 @@ async function upload() {
   data.image_url ? "✅ Done" : "❌ Error generating image";
 
   // 👉 SHOW RESULT IMAGE
-  if (data.image_url) {
-    let resultImg = document.createElement("img");
-    resultImg.src = data.image_url;
-    resultImg.style.marginTop = "15px";
-    resultImg.style.width = "100%";
+ if (data.image_url) {
 
-    document.querySelector(".card").appendChild(resultImg);
-  }
+  // REMOVE OLD IMAGE
+  let old = document.getElementById("result");
+  if (old) old.remove();
+
+  // ADD NEW IMAGE
+  let resultImg = document.createElement("img");
+  resultImg.src = data.image_url;
+  resultImg.style.marginTop = "15px";
+  resultImg.style.width = "100%";
+  resultImg.id = "result";
+
+  document.querySelector(".card").appendChild(resultImg);
+}
 }
 </script>
 
