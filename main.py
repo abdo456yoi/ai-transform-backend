@@ -24,9 +24,5 @@ async def generate(
     content = await image.read()
 
     return {
-        "message": "Received successfully",
-        "filename": image.filename,
-        "gender": gender,
-        "goal": goal,
-        "size": len(content)
+        "image_url": "https://picsum.photos/500"
     }
