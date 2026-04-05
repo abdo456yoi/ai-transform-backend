@@ -2,24 +2,47 @@
 <html>
 <head>
   <title>AI Transformation</title>
+
   <style>
     body {
       margin: 0;
       font-family: Arial;
       background: linear-gradient(135deg, #0f172a, #020617);
       color: white;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
     }
 
+    /* MAIN CONTAINER (SIDE BY SIDE) */
+    .container {
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+    }
+
+    /* LEFT = FORM */
     .card {
       background: #111827;
       padding: 30px;
       border-radius: 20px;
       width: 350px;
       text-align: center;
+      box-shadow: 0 0 40px rgba(0,0,0,0.6);
+    }
+
+    /* RIGHT = RESULT */
+    .result-box {
+      background: #111827;
+      padding: 20px;
+      border-radius: 20px;
+      width: 350px;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       box-shadow: 0 0 40px rgba(0,0,0,0.6);
     }
 
@@ -71,34 +94,53 @@
     .loader {
       margin-top: 10px;
     }
+
+    .download {
+      margin-top: 10px;
+      color: #22c55e;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
   </style>
 </head>
+
 <body>
 
-<div class="card">
+<div class="container">
 
-<h1>🔥 AI Transformation</h1>
+  <!-- LEFT SIDE (FORM) -->
+  <div class="card">
 
-<label class="upload-box">
-  Click to upload image
-  <input type="file" id="image" onchange="preview()">
-</label>
+    <h1>🔥 AI Transformation</h1>
 
-<img id="preview" style="display:none"/>
+    <label class="upload-box">
+      Click to upload image
+      <input type="file" id="image" onchange="preview()">
+    </label>
 
-<select id="gender">
-  <option value="male">Male</option>
-  <option value="female">Female</option>
-</select>
+    <img id="preview" style="display:none"/>
 
-<select id="goal">
-  <option value="lose_weight">Lose Weight</option>
-  <option value="gain_muscle">Gain Muscle</option>
-</select>
+    <select id="gender">
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
 
-<button onclick="upload()">Generate</button>
+    <select id="goal">
+      <option value="lose_weight">Lose Weight</option>
+      <option value="gain_muscle">Gain Muscle</option>
+    </select>
 
-<div id="status" class="loader"></div>
+    <button onclick="upload()">Generate</button>
+
+    <div id="status" class="loader"></div>
+
+  </div>
+
+  <!-- RIGHT SIDE (RESULT) -->
+  <div class="result-box" id="resultBox">
+    <p>No result yet</p>
+  </div>
 
 </div>
 
@@ -128,25 +170,18 @@ async function upload() {
 
   let data = await res.json();
 
-  document.getElementById("status").innerText =
-  data.image_url ? "✅ Done" : "❌ Error generating image";
+  document.getElementById("status").innerText = "✅ Done";
 
-  // 👉 SHOW RESULT IMAGE
- if (data.image_url) {
+  let box = document.getElementById("resultBox");
 
-  // REMOVE OLD IMAGE
-  let old = document.getElementById("result");
-  if (old) old.remove();
-
-  // ADD NEW IMAGE
-  let resultImg = document.createElement("img");
-  resultImg.src = data.image_url;
-  resultImg.style.marginTop = "15px";
-  resultImg.style.width = "100%";
-  resultImg.id = "result";
-
-  document.querySelector(".card").appendChild(resultImg);
-}
+  if (data.image_url) {
+    box.innerHTML = `
+      <img src="${data.image_url}" />
+      <a class="download" href="${data.image_url}" target="_blank">⬇ Download</a>
+    `;
+  } else {
+    box.innerHTML = "<p>Error generating image</p>";
+  }
 }
 </script>
 
