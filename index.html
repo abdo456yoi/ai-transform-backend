@@ -128,7 +128,8 @@ async function upload() {
 
   let data = await res.json();
 
-  document.getElementById("status").innerText = "✅ Done";
+  document.getElementById("status").innerText =
+  data.image_url ? "✅ Done" : "❌ Error generating image";
 
   // 👉 SHOW RESULT IMAGE
   if (data.image_url) {
