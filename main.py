@@ -59,7 +59,7 @@ Style:
 
         # Run AI model
         output = replicate.run(
-            "black-forest-labs/flux-dev",
+            "black-forest-labs/flux-2-pro",
             input={
                 "prompt": full_prompt,
                 "input_images": [image_data_url]
