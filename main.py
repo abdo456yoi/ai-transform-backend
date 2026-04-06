@@ -37,7 +37,25 @@ async def generate(
         image_data_url = f"data:image/png;base64,{image_base64}"
 
         # Strong prompt
-        full_prompt = f"{prompt}, same person, realistic fitness transformation, lean body, photorealistic, high detail"
+        full_prompt = f"""
+Transform THIS EXACT PERSON in the input image.
+
+STRICT RULES:
+- same person
+- same face
+- same identity
+- DO NOT change gender
+- DO NOT replace person
+
+Transformation:
+- fit body
+- realistic fat loss
+- natural muscles
+
+Style:
+- photorealistic
+- realistic lighting
+""""
 
         # Run AI model
         output = replicate.run(
