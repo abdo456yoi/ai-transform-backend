@@ -8,76 +8,77 @@
 body {
     margin: 0;
     font-family: Arial;
-    background: linear-gradient(180deg, #020b1f, #020617);
+    background: linear-gradient(135deg, #000428, #004e92);
     color: white;
 }
 
 h1 {
     text-align: center;
+    margin-top: 20px;
 }
 
 .container {
     display: flex;
-    justify-content: space-between;
+    gap: 30px;
     padding: 40px;
-    gap: 40px;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
 }
 
-.box {
-    width: 30%;
-}
-
-.preview {
+.card {
+    background: #0b1a2a;
+    padding: 20px;
+    border-radius: 15px;
     width: 100%;
-    height: 400px;
-    border: 2px solid #555;
+    max-width: 320px;
+    text-align: center;
+}
+
+img {
+    width: 100%;
     border-radius: 12px;
+    margin-top: 10px;
+}
+
+#resultPreview {
+    width: 100%;
+    min-height: 250px;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
 }
 
-.preview img {
+textarea, select {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.center {
-    width: 40%;
-}
-
-textarea {
-    width: 100%;
-    height: 120px;
-    border-radius: 10px;
-    padding: 10px;
-    border: none;
-    font-size: 16px;
-}
-
-select {
-    width: 100%;
+    margin-top: 10px;
     padding: 10px;
     border-radius: 8px;
-    margin-bottom: 10px;
+    border: none;
 }
 
 button {
+    margin-top: 15px;
+    padding: 12px;
     width: 100%;
-    padding: 15px;
     border: none;
     border-radius: 10px;
     background: #22c55e;
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
-    margin-top: 10px;
 }
 
-.download {
+button:hover {
     background: #16a34a;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
 }
 </style>
 </head>
@@ -88,61 +89,48 @@ button {
 
 <div class="container">
 
-    <!-- LEFT -->
-    <div class="box">
+    <!-- INPUT -->
+    <div class="card">
         <input type="file" id="imageInput">
 
-        <div class="preview" id="inputPreview">
-            preview
-        </div>
-    </div>
+        <img id="inputPreview" />
 
-    <!-- CENTER -->
-    <div class="center">
-
-        <label>Aspect Ratio</label>
         <select id="ratio">
-            <option value="1:1">1:1</option>
-            <option value="9:16" selected>9:16</option>
-            <option value="4:5">4:5</option>
+            <option value="9:16">9:16 (TikTok)</option>
             <option value="5:4">5:4</option>
-            <option value="3:4">3:4</option>
+            <option value="4:3">4:3</option>
+            <option value="3:2">3:2</option>
+            <option value="1:1">1:1</option>
         </select>
 
-        <label>Prompt</label>
-        <textarea id="prompt" placeholder="Write your transformation prompt..."></textarea>
+        <textarea id="prompt" rows="6">
+same person, identical face, do not change identity, preserve natural skin texture, clear strong visible weight loss transformation, realistic body proportions, same background, photorealistic
+        </textarea>
 
         <button onclick="generate()">Generate</button>
-
     </div>
 
-    <!-- RIGHT -->
-    <div class="box">
-        <div class="preview" id="resultPreview">
-            preview
-        </div>
-
-        <button class="download" onclick="downloadImage()">Download</button>
+    <!-- RESULT -->
+    <div class="card">
+        <div id="resultPreview">Result here</div>
+        <button onclick="downloadImage()">Download</button>
     </div>
 
 </div>
 
 <script>
-
 let resultUrl = "";
 
-// preview input image
-document.getElementById("imageInput").addEventListener("change", function(e){
+// 🔥 IMAGE PREVIEW
+document.getElementById("imageInput").onchange = function(e) {
     const file = e.target.files[0];
     if (!file) return;
 
-    const url = URL.createObjectURL(file);
+    document.getElementById("inputPreview").src =
+        URL.createObjectURL(file);
+};
 
-    document.getElementById("inputPreview").innerHTML =
-        `<img src="${url}">`;
-});
-
-// generate
+// 🚀 GENERATE
 async function generate() {
 
     const file = document.getElementById("imageInput").files[0];
@@ -150,43 +138,50 @@ async function generate() {
     const ratio = document.getElementById("ratio").value;
 
     if (!file) return alert("Upload image first");
-    if (!prompt) return alert("Enter prompt");
 
     const formData = new FormData();
     formData.append("image", file);
     formData.append("prompt", prompt);
     formData.append("ratio", ratio);
 
-    document.getElementById("resultPreview").innerHTML = "⏳ Generating...";
-
-    const res = await fetch("https://YOUR-BACKEND.onrender.com/generate", {
-        method: "POST",
-        body: formData
-    });
-
-    const data = await res.json();
-
-    if (data.error) {
-        alert(data.error);
-        return;
-    }
-
-    resultUrl = data.image_url;
-
     document.getElementById("resultPreview").innerHTML =
-        `<img src="${resultUrl}">`;
+        "⏳ Generating... (wait 20–40s first time)";
+
+    try {
+        const res = await fetch("https://ai-transform-backend.onrender.com/generate", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+        console.log("API:", data);
+
+        if (data.error) {
+            alert(data.error);
+            document.getElementById("resultPreview").innerHTML = "❌ Error";
+            return;
+        }
+
+        resultUrl = data.image_url;
+
+        document.getElementById("resultPreview").innerHTML =
+            `<img src="${resultUrl}">`;
+
+    } catch (err) {
+        console.error(err);
+        alert("Backend sleeping or error");
+    }
 }
 
-// download
+// ⬇️ DOWNLOAD
 function downloadImage() {
-    if (!resultUrl) return alert("No image yet");
+    if (!resultUrl) return alert("Generate image first");
 
     const a = document.createElement("a");
     a.href = resultUrl;
     a.download = "result.png";
     a.click();
 }
-
 </script>
 
 </body>
