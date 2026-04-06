@@ -24,18 +24,34 @@ body {
     margin-bottom: 20px;
 }
 
+/* GRID */
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
+/* CARD */
 .card {
     background: #0b1220;
     padding: 20px;
     border-radius: 15px;
 }
 
+/* IMAGE PREVIEW */
+.preview {
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
+/* RESULT IMAGE */
+.result-img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+/* TEXTAREA */
 textarea {
     width: 100%;
     height: 80px;
@@ -45,6 +61,7 @@ textarea {
     border: none;
 }
 
+/* BUTTON */
 button {
     width: 100%;
     margin-top: 10px;
@@ -61,11 +78,14 @@ button:hover {
     background: #16a34a;
 }
 
-.result-img {
-    width: 100%;
-    border-radius: 10px;
+/* LOADING */
+.loading {
+    text-align: center;
+    margin-top: 20px;
+    display: none;
 }
 
+/* MOBILE */
 @media (max-width: 768px) {
     .grid {
         grid-template-columns: 1fr;
@@ -81,18 +101,23 @@ button:hover {
 
     <div class="grid">
 
-        <!-- LEFT -->
+        <!-- LEFT SIDE -->
         <div class="card">
             <input type="file" id="imageInput">
+
+            <img id="preview" class="preview" style="display:none;">
 
             <textarea id="prompt">body transformation</textarea>
 
             <button onclick="generate()">Generate</button>
         </div>
 
-        <!-- RIGHT -->
+        <!-- RIGHT SIDE -->
         <div class="card">
             <h3>Result</h3>
+
+            <div class="loading" id="loading">⏳ Generating...</div>
+
             <img id="resultImage" class="result-img" style="display:none;">
         </div>
 
@@ -102,8 +127,23 @@ button:hover {
 <script>
 const API_URL = "https://ai-transform-backend.onrender.com/generate";
 
+const imageInput = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+const resultImage = document.getElementById("resultImage");
+const loading = document.getElementById("loading");
+
+// Preview image
+imageInput.addEventListener("change", () => {
+    const file = imageInput.files[0];
+    if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = "block";
+    }
+});
+
+// Generate
 async function generate() {
-    const file = document.getElementById("imageInput").files[0];
+    const file = imageInput.files[0];
     const prompt = document.getElementById("prompt").value;
 
     if (!file) {
@@ -115,6 +155,10 @@ async function generate() {
     formData.append("image", file);
     formData.append("prompt", prompt);
 
+    // Show loading
+    loading.style.display = "block";
+    resultImage.style.display = "none";
+
     try {
         const res = await fetch(API_URL, {
             method: "POST",
@@ -123,8 +167,9 @@ async function generate() {
 
         const data = await res.json();
 
+        loading.style.display = "none";
+
         if (data.image_url) {
-            const resultImage = document.getElementById("resultImage");
             resultImage.src = data.image_url;
             resultImage.style.display = "block";
         } else {
@@ -132,6 +177,7 @@ async function generate() {
         }
 
     } catch (err) {
+        loading.style.display = "none";
         alert("Request failed");
     }
 }
