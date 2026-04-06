@@ -30,18 +30,17 @@ async def generate(
         image_data_url = f"data:image/png;base64,{image_base64}"
 
         full_prompt = f"""
-same person, same face, same identity,
-do not change person,
+same person, identical face, do not change identity,
+keep original face unchanged,
+preserve natural skin texture and imperfections,
 
-Transformation:
-fit athletic body,
-realistic fat loss,
-natural muscles,
+same pose and same background,
 
-Style:
 photorealistic,
 realistic lighting,
 high detail,
+avoid artificial look,
+avoid plastic skin,
 
 User request: {prompt}
 """
