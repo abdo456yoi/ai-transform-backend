@@ -1,16 +1,11 @@
 import replicate
-import os
 import base64
-
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 
-# Load API token from environment
-os.environ["REPLICATE_API_TOKEN"] = os.getenv("REPLICATE_API_TOKEN")
-
 app = FastAPI()
 
-# Enable CORS (important for frontend)
+# ✅ Enable CORS (important for frontend)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,50 +14,56 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Test route
+
+# ✅ Root route (to avoid "Not Found")
 @app.get("/")
 def root():
-    return {"message": "API is working 🚀"}
+    return {"status": "API is running 🚀"}
 
-# Main AI endpoint
+
+# ✅ Generate endpoint
 @app.post("/generate")
 async def generate(
     image: UploadFile = File(...),
     prompt: str = Form(...)
 ):
     try:
-        # Convert image to base64
+        # Read uploaded image
         content = await image.read()
+
+        # Convert image to base64
         image_base64 = base64.b64encode(content).decode("utf-8")
         image_data_url = f"data:image/png;base64,{image_base64}"
 
-        # Strong prompt
+        # 🔥 Strong prompt (VERY IMPORTANT for quality)
         full_prompt = f"""
-Transform THIS EXACT PERSON in the input image.
-
-STRICT RULES:
-- same person
-- same face
-- same identity
-- DO NOT change gender
-- DO NOT replace person
+same person, same face, same identity,
+do not change person, do not replace face,
 
 Transformation:
-- fit body
-- realistic fat loss
-- natural muscles
+fit athletic body,
+realistic fat loss,
+natural muscles,
+before and after fitness transformation,
 
 Style:
-- photorealistic
-- realistic lighting
-""""
+photorealistic,
+realistic lighting,
+high detail skin,
+8k quality,
 
-        # Run AI model
+User request: {prompt}
+"""
+
+        # 🚀 Run FLUX 2 PRO model
         output = replicate.run(
             "black-forest-labs/flux-2-pro",
             input={
                 "prompt": full_prompt,
-                "input_images": [image_data_url]
+                "input_images": [image_data_url],
+                "aspect_ratio": "9:16",
+                "output_format": "webp",
+                "output_quality": 90
             }
         )
 
