@@ -33,7 +33,7 @@ async def generate(
 same person, identical face, do not change identity,
 keep original face unchanged,
 preserve natural skin texture and imperfections,
-
+clear visible transformation, strong but realistic change
 same pose and same background,
 
 photorealistic,
