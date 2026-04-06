@@ -1,11 +1,12 @@
-import base64
-import replicate
-from fastapi import FastAPI, UploadFile, Form
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
+import replicate
+import base64
+import os
 
 app = FastAPI()
 
-# allow frontend requests
+# ✅ Allow frontend requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,9 +15,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ✅ Replicate API
+replicate_client = replicate.Client(api_token=os.getenv("REPLICATE_API_TOKEN"))
+
 @app.post("/generate")
 async def generate(
-    image: UploadFile,
+    image: UploadFile = File(...),
     prompt: str = Form(...),
     ratio: str = Form(...)
 ):
@@ -26,10 +30,10 @@ async def generate(
         image_base64 = base64.b64encode(content).decode("utf-8")
         image_data_url = f"data:image/png;base64,{image_base64}"
 
-        # 🔥 prompt comes ONLY from frontend
+        # ✅ ONLY frontend prompt (no hardcoded prompt)
         full_prompt = prompt
 
-        output = replicate.run(
+        output = replicate_client.run(
             "black-forest-labs/flux-2-pro",
             input={
                 "prompt": full_prompt,
