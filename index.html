@@ -121,15 +121,17 @@
 
     <img id="preview" style="display:none"/>
 
-    <select id="gender">
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
-
-    <select id="goal">
-      <option value="lose_weight">Lose Weight</option>
-      <option value="gain_muscle">Gain Muscle</option>
-    </select>
+   <textarea id="prompt" placeholder="Describe your transformation...
+Example: athletic body, lose fat, visible abs, realistic transformation"
+style="
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  margin-bottom:15px;
+  resize:none;
+  height:100px;
+"></textarea>
 
     <button onclick="upload()">Generate</button>
 
@@ -158,8 +160,7 @@ async function upload() {
 
   let formData = new FormData();
   formData.append("image", file);
-  formData.append("gender", document.getElementById("gender").value);
-  formData.append("goal", document.getElementById("goal").value);
+  formData.append("prompt", document.getElementById("prompt").value);
 
   document.getElementById("status").innerText = "⏳ Generating...";
 
