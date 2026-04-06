@@ -5,21 +5,16 @@ from fastapi import FastAPI, UploadFile, File, Form
 
 app = FastAPI()
 
-@app.get("/")
-def home():
-    return {"message": "API working 🚀"}
-
 @app.post("/generate")
 async def generate(
     image: UploadFile = File(...),
     prompt: str = Form(...)
 ):
     content = await image.read()
-
     image_base64 = base64.b64encode(content).decode("utf-8")
     image_data_url = f"data:image/png;base64,{image_base64}"
 
-    full_prompt = f"{prompt}, same person, realistic fitness transformation, photorealistic, high detail"
+    full_prompt = f"{prompt}, same person, realistic fitness transformation, photorealistic"
 
     output = replicate.run(
         "black-forest-labs/flux-2-pro",
@@ -31,5 +26,4 @@ async def generate(
     )
 
     image_url = output[0] if isinstance(output, list) else output
-
     return {"image_url": image_url}
