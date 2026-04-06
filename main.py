@@ -5,7 +5,7 @@ from fastapi import FastAPI, UploadFile, File, Form
 
 app = FastAPI()
 
-# ✅ IMPORTANT: connect API key
+# connect replicate API
 replicate.Client(api_token=os.getenv("REPLICATE_API_TOKEN"))
 
 @app.post("/generate")
@@ -17,7 +17,7 @@ async def generate(
     image_base64 = base64.b64encode(content).decode("utf-8")
     image_data_url = f"data:image/png;base64,{image_base64}"
 
-    full_prompt = f"{prompt}, same person, realistic fitness transformation, photorealistic, high detail, natural lighting"
+    full_prompt = f"{prompt}, same person, realistic fitness transformation, photorealistic"
 
     output = replicate.run(
         "black-forest-labs/flux-2-pro",
