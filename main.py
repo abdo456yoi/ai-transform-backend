@@ -50,7 +50,7 @@ User request: {prompt}
             input={
                 "prompt": full_prompt,
                 "input_images": [image_data_url],
-                "aspect_ratio": "9:16"
+                "aspect_ratio": "5:4"
             }
         )
 
