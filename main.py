@@ -1,11 +1,11 @@
-import replicate
 import base64
-from fastapi import FastAPI, UploadFile, File, Form
+import replicate
+from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# ✅ CORS (IMPORTANT)
+# allow frontend requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,14 +14,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def root():
-    return {"status": "API running 🚀"}
-
 @app.post("/generate")
 async def generate(
-    image: UploadFile = File(...),
-    prompt: str = Form(...)
+    image: UploadFile,
+    prompt: str = Form(...),
+    ratio: str = Form(...)
 ):
     try:
         content = await image.read()
@@ -29,28 +26,15 @@ async def generate(
         image_base64 = base64.b64encode(content).decode("utf-8")
         image_data_url = f"data:image/png;base64,{image_base64}"
 
-        full_prompt = f"""
-same person, identical face, do not change identity,
-keep original face unchanged,
-preserve natural skin texture and imperfections,
-clear visible transformation, strong but realistic change
-same pose and same background,
-
-photorealistic,
-realistic lighting,
-high detail,
-avoid artificial look,
-avoid plastic skin,
-
-User request: {prompt}
-"""
+        # 🔥 prompt comes ONLY from frontend
+        full_prompt = prompt
 
         output = replicate.run(
             "black-forest-labs/flux-2-pro",
             input={
                 "prompt": full_prompt,
                 "input_images": [image_data_url],
-                "aspect_ratio": "5:4"
+                "aspect_ratio": ratio
             }
         )
 
